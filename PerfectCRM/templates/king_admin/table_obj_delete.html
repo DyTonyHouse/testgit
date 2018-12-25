@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% load tags %}
+
+{#{% display_obj_related model_obj %}#}
+{% block body %}
+    <p style="color: red">You sure delete?</p>
+<form action="" method="post">
+    <button type="submit" class="btn btn-danger" style="">Yes,I'm sure</button>
+    <button type="button" class="btn btn-success" style="margin-left: 80px"><a href="{% url 'table_obj' app_name table_name %}" style="color: black;text-decoration: none">No,thanks!</a></button>
+</form>
+{% endblock %}
+
+{#<a href="{% url 'table_obj_delete' app_name table_name model_obj_id %}" style="text-decoration: none;color: black"></a>#}

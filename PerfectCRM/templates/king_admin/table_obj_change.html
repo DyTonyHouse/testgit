@@ -1,0 +1,96 @@
+{% extends 'king_admin/table_index.html' %}
+
+{% load tags %}
+
+{% block extra_css %}
+    <style type="text/css">
+        .filter_select_box {
+            height: 250px !important;
+            width: 100%;
+            border-radius: 3px;
+        }
+    </style>
+{% endblock %}
+
+{% block container %}
+    <div class="container" style="margin-top: 50px">
+
+        <div class="row">
+            <form class="form-horizontal" onsubmit="return SelectAllData()" method="POST">
+
+                {% for field in form_obj %}
+                    <div class="form-group">
+                        <div class="col-md-8" style="font-weight: normal">
+                            <div class="col-md-2 col-md-offset-1">
+                                {% if field.field.required %}
+                                    <b>{{ field.label }}</b>
+                                {% else %}
+                                    {{ field.label }}
+                                {% endif %}
+                            </div>
+
+                            {% if field.name in admin_class.filter_horizontal %}
+                                <div class="col-md-3">
+
+                                    {% get_field_obj_list field admin_class form_obj as field_obj_list %}
+                                    <select multiple id="id_{{ field.name }}_from"
+                                            class="filter_select_box">
+                                        {% for obj in field_obj_list %}
+                                            <option value="{{ obj.id }}"
+                                                    ondblclick="MoveEleTo(this, 'id_{{ field.name }}_to', 'id_{{ field.name }}_from')">{{ obj }}</option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+                                <div class="col-sm-1">
+
+                                </div>
+                                <div class="col-md-3">
+                                    {% get_field_selected_obj_list field form_obj as field_selected_obj_list %}
+                                    <select tag="chosen_list" multiple id="id_{{ field.name }}_to"
+                                            class="filter_select_box" name="{{ field.name }}">
+                                        {% if field_selected_obj_list %}
+                                            {% for obj in field_selected_obj_list %}
+                                                <option value="{{ obj.id }}"
+                                                        ondblclick="MoveEleTo(this, 'id_{{ field.name }}_from', 'id_{{ field.name }}_to')">{{ obj }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+
+                                    </select>
+                                </div>
+                            {% else %}
+                                <div class="col-md-6">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                {% block button_delete %}
+                    <button type="button" class="btn btn-danger pull-left" style="margin-bottom: 50px"><a
+                            href="{% url 'table_obj_delete' app_name table_name form_obj.instance.id %}"
+                            style="color: black;text-decoration: none">Delete</a></button>
+                {% endblock %}
+                <button type="submit" class="btn btn-success pull-right" style="margin-bottom: 50px">Save</button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        function MoveEleTo(ele, taget_id, new_taget_id) {
+            var opt_ele = "<option value='" + $(ele).val() + "' ondblclick=\"MoveEleTo(this, '" + new_taget_id + "', '" + taget_id + "')\">" + $(ele).text() + "</option>";
+            console.log(opt_ele)
+
+            $("#" + taget_id).append(opt_ele);
+            $(ele).remove();
+        }
+
+        function SelectAllData() {
+            $("select[tag='chosen_list'] option").each(function () {
+                $(this).prop("selected", true)
+            })
+            return true
+        }
+    </script>
+{% endblock %}

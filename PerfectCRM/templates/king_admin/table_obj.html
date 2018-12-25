@@ -1,0 +1,113 @@
+{% extends 'king_admin/table_index.html' %}
+
+{% load tags %}
+{% block container %}
+    <div class="container" style="margin-top: 50px">
+        <div class="row">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        {% render_table_name admin_class %}
+                        <a href="add/" class="pull-right" style="color: black;text-decoration: none">添加</a>
+                    </h3>
+
+                </div>
+                <div class="panel-body">
+                    <div>
+                        <form action="" method="get">
+                            <div class="row">
+                                {% for filter_field in admin_class.list_filters %}
+                                    <div class="col-lg-2">
+                                        <span class="col-lg-1">{{ filter_field }}</span>{% render_filter_column filter_field admin_class filter_conditions %}
+                                    </div>
+                                {% endfor %}
+                                <div class="col-lg-2">
+                                    <button type="submit" class="btn btn-success" style="margin-top: 19px">检索</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2" style="margin-top: 10px">
+                                    <select name="" id="" class='form-control'>
+                                        <option value="">---</option>
+                                        {% for action in admin_class.actions %}
+                                            <option value="{{ action }}">{{ action }}</option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+                                <div class="col-lg-1">
+                                    <button type="" class="btn" style="margin-top: 10px">Go</button>
+                                </div>
+
+                                <div class="col-lg-3" style="margin-top: 10px">
+                                    <input type="search" class="form-control" placeholder="search by
+                                            {% for search_field in admin_class.search_fields %}{{ search_field }} {% endfor %}"
+                                           value="{{ search_key }}" name="_q">
+                                </div>
+                                <div class="col-lg-1">
+                                    <button type="submit" class="btn btn-success" style="margin-top: 10px">search
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" onclick="CheckAllToggle(this)"></th>
+                            {% for column in admin_class.list_display %}
+                                {% table_header_column_sort column orderby_key filter_conditions %}
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        共计<span class="alert-danger">{{ posts.paginator.count }}</span>条
+                        </tfoot>
+                        <tbody>
+                        {#                        {% get_objects_all admin_class as model_objs %}#}
+                        {% for obj in posts %}
+                            <tr>
+                                <td><input tag="obj_checkbox" type="checkbox" value="{{ obj.id }}"></td>
+                                {% build_table_row request obj admin_class %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+
+                    <nav aria-label="...">
+                        <ul class="pagination">
+                            {# 判断posts是否有上一页#}
+                            {% if posts.has_previous %}
+                                {% head_page posts filter_conditions orderby_key search_key %}
+                            {% endif %}
+
+                            {# 中间显示页码需要对所有的页码进行循环 #}
+                            {# posts.paginator得到的又是一个paginator对象，只有paginator对象才有page_range方法 #}
+
+                            {% loop_display_page posts filter_conditions orderby_key search_key %}
+
+
+                            {# 判断posts是否有下一页#}
+                            {% if posts.has_next %}
+                                {% foot_page posts filter_conditions orderby_key search_key %}
+                            {% endif %}
+
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function CheckAllToggle(ele) {
+            if ($(ele).prop("checked")) {
+                $("input[tag='obj_checkbox']").prop("checked", true);
+            } else {
+                $("input[tag='obj_checkbox']").prop("checked", false);
+            }
+        }
+    </script>
+{% endblock %}
